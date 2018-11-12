@@ -12,7 +12,9 @@
   * [1° Forma Normal](#1-forma-normal)
   * [2° Forma Normal](#2-forma-normal)
   * [3° Forma Normal](#3-forma-normal)
-
+* [SQL](#sql)
+  * [DDL](#ddl-data-definition-language)
+  * [DML](#dml-data-management-language)
 
 
 ### Modelo Relacional
@@ -263,3 +265,66 @@ Busca que todos los atributos de la tabla dependan solo de la clave primaria (en
 #### 3° Forma Normal
 
 Busca evitar que haya atributos (que no son PKs) que tengan una dependencia entre sí. En el ejemplo anterior esto se ve en la tabla de productos donde `descrFamilia` depende de `codFamilia` y a la vez tanto `codSubFamilia` como `descrSubFamilia` dependen de `codFamilia`.
+
+### SQL
+
+Se compone de dos grandes "lenguajes":
+* Data Definition Language:
+  * CREATE
+  * ALTER
+  * DROP
+* Data Management Language
+
+
+##### DDL - Data Definition Language
+```sql
+create database PracticaPacial;
+use PracticaParcial;
+create table Facturas (
+  nroFactura INTEGER PRIMARY KEY,
+  fecha DATE NOT NULL
+)
+```
+
+###### Constrains
+
+* `PK`
+* `FK`
+* `NOT NULL` / `NULL` (default)
+* `UNIQUE`
+* `CHECK`
+* `DEFAULT`
+
+###### Data types
+
+* Numericos
+  * Enteros
+    * `BIGINT`
+    * `INTEGER`
+    * `SMALLINT`
+    * `TINYINT`
+  * Decimales
+    * `NUMERIC(P, S)`
+    * `DECIMAL(P, S)`
+* Alfanumericos
+  * Longitud Fija `char(n)`
+  * Longitud Variable `varchar(n)`
+* Fecha `DATE`
+
+##### DML - Data Management Language
+
+* `SELECT`
+* `INSERT`
+* `UPDATE`
+* `DELETE`
+* `MERGE`
+
+```sql
+SELECT *, lista_de_columnas, col1, col2, col3, col4 as alias, distinct(codProd)
+# distinct => lo que se se repite lo pone una sola vez
+FROM nombre_de_tabla
+WHERE condiciones # >, <, >=, <=, =, !=, and, or, not, between, in, like
+ORDER BY columna, posicionColumna ASC/DESC
+GROUP BY campo # count(*), sum, avg, max, min # funciones agregadas que van en el select
+HAVING condicion # similar al where pero actua sobre lo agregado
+```
