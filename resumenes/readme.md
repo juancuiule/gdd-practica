@@ -1,5 +1,20 @@
 # Gestión de Datos
 
+## Indice
+
+* [Modelo Relacional](#modelo-relacional)
+  * [Dominio](#dominio)
+  * [Tabla](#tabla)
+    * [Propiedades](#propiedades)
+* [Integridad](#integridad)
+* [Independencia de Datos](#independencia-de-datos)
+* [Normalización](#normalización)
+  * [1° Forma Normal](#1-forma-normal)
+  * [2° Forma Normal](#2-forma-normal)
+  * [3° Forma Normal](#3-forma-normal)
+
+
+
 ### Modelo Relacional
 
 - Definición de estrucuta: tablas
@@ -244,3 +259,7 @@ Busca que todos los atributos de la tabla dependan solo de la clave primaria (en
     </td>
  </tr>
 </table>
+
+#### 3° Forma Normal
+
+Busca evitar que haya atributos (que no son PKs) que tengan una dependencia entre sí. En el ejemplo anterior esto se ve en la tabla de productos donde `descrFamilia` depende de `codFamilia` y a la vez tanto `codSubFamilia` como `descrSubFamilia` dependen de `codFamilia`.
