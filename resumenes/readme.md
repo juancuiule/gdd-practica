@@ -1,6 +1,6 @@
 # Gestión de Datos
 
-## Indice
+### Indice
 
 * [Modelo Relacional](#modelo-relacional)
   * [Dominio](#dominio)
@@ -15,7 +15,7 @@
 * [SQL](#sql)
   * [DDL](#ddl-data-definition-language)
   * [DML](#dml-data-management-language)
-
+* [Tablas Temporales](#tablas-temporales)
 
 ### Modelo Relacional
 
@@ -270,9 +270,9 @@ Busca evitar que haya atributos (que no son PKs) que tengan una dependencia entr
 
 Se compone de dos grandes "lenguajes":
 * Data Definition Language:
-  * CREATE
-  * ALTER
-  * DROP
+  * `CREATE`
+  * `ALTER`
+  * `DROP`
 * Data Management Language
 
 
@@ -311,6 +311,29 @@ create table Facturas (
   * Longitud Variable `varchar(n)`
 * Fecha `DATE`
 
+```sql
+create table Facturas (
+  nroFactura BIGINT PRIMARY KEY,
+  fechaEmision DATE NOT NULL,
+  fechaVencimiento DATE NOT NULL,
+  codClienter INT NOT NULL REFERENCES Clientes,
+  CHECK (fechaVencimiento >= fechaEmision)
+)
+
+create table Clientes (
+  codCliente INT PRIMARY KEY,
+  razonSocial varchar(100) NOT NULL
+)
+
+create table Items (
+  nroFactura BIGINT,
+  codProducto INT
+  cantidad DECIMAL(10,3) NOT NULL,
+  precio DECIMAL(10,2) CHECK(precio > 0),
+  PRIMARY KEY (nroFactura, codProducto)
+)
+```
+
 ##### DML - Data Management Language
 
 * `SELECT`
@@ -318,6 +341,8 @@ create table Facturas (
 * `UPDATE`
 * `DELETE`
 * `MERGE`
+
+###### Select
 
 ```sql
 SELECT *, lista_de_columnas, col1, col2, col3, col4 as alias, distinct(codProd)
@@ -328,3 +353,82 @@ ORDER BY columna, posicionColumna ASC/DESC
 GROUP BY campo # count(*), sum, avg, max, min # funciones agregadas que van en el select
 HAVING condicion # similar al where pero actua sobre lo agregado
 ```
+
+###### Insert
+
+```sql
+INSERT INTO tabla (col1, col2, col3)
+VALUES (val1, val2, val3), (val1, val2, val3);
+
+INSERT INTO tabla
+SELECT col1, col2
+FROM otra_tabla
+# Todo lo del select va a "tabla"
+```
+
+###### Delete
+
+```sql
+DELETE FROM tabla # esta línea sola borra TODO
+WHERE condicion
+```
+
+###### Update
+
+```sql
+UPDATE tabla
+SET col1 = val1
+    col2 = val2
+    ...
+    ...
+WHERE condicion
+```
+
+### Tablas Temporales
+
+Son tablas de sesión, es decir, se borran cuando se destruye la sesión.
+Sirven para dividir selects de grandes joins.
+
+Su creación, al igual que las tablas comunes, puede ser explicita o implicita.
+
+###### Explicita
+```sql
+create table #tabla_temporal (
+  id BIGINT PRIMARY KEY,
+  campo INT
+);
+insert into #tabla_temporal
+select * from tabla where condicion;
+```
+
+###### Implicita
+```sql
+select *
+into #tabla_temporal
+from tabla
+where condicion;
+```
+
+### Transacciones
+
+Una transaccion es un conjunto de instrucciones que se tienen que llevar de manera **atomica**, es decrir, se realizan todas o ninguna, si falla alguna de ellas se revierte lo hecho por todas las anteriores y no se efectuan las siguientes.
+
+```sql
+# Estado consistente
+BEGIN TRANSACTION
+  ...
+  ...
+  ...
+  COMMIT TRANSACTION # => nuevo estado, todo salio bien
+  ROLLBACK TRANSACTION # => vuelve al estado anterior, se deshacen los cambios
+```
+
+Lo importante es que por cualquiera de los dos caminos se llega a un estado que sigue siendo consistente.
+
+Tienen que seguir el concepto `ACID`:
+* Atomicidad
+* Consistencia (va más allá de la integridad, tiene que ver con el negocio)
+* Isolation - Aislamiento (las transacciones corren en paralelo)
+* Durabilidad
+
+Se maneja por medio de logs transaccionales que guardan lo que se hizo.
