@@ -16,6 +16,11 @@
   * [DDL](#ddl-data-definition-language)
   * [DML](#dml-data-management-language)
 * [Tablas Temporales](#tablas-temporales)
+* [Transacciones](#transacciones)
+* [Indices](#indices)
+* [Subquery](#subquery)
+* [Isolation Levels](#isolation-levels)
+* [Triggers](#triggers)
 
 ### Modelo Relacional
 
@@ -384,6 +389,23 @@ SET col1 = val1
 WHERE condicion
 ```
 
+### Vistas
+
+Conjunto de columnas reales o virtuales de la misma tabla con algun filtro determinado o no:
+* Tienen nombre especifico
+* No ocupan espacio de almacenamiento
+* Esta definida por una consulta
+
+No se pueden hacer indices o triggers
+
+```sql
+create view nombre (col1, col3)
+as
+select col1, col3
+from tabla
+where condicion
+```
+
 ### Tablas Temporales
 
 Son tablas de sesión, es decir, se borran cuando se destruye la sesión.
@@ -432,3 +454,67 @@ Tienen que seguir el concepto `ACID`:
 * Durabilidad
 
 Se maneja por medio de logs transaccionales que guardan lo que se hizo.
+
+### Indices
+
+Facilitan la busqueda aprovechando los beneficios de las estructuras arboreas. También ayudan a comprobar la unicidad.
+
+Hay indices automaticos que se generan por `PK`s y `UNIQUE`s.
+
+###### Costos
+* Costo de espacio en disco (aprox 30% mas de espacio)
+* Costo de procesamiento y mantenimiento (se usan en cuando se hace un `update`, `delete` o `insert` para mantener el arbol)
+
+Se usan cuando tenemos columnas que se usan en `JOIN`s, filtros u `ORDER BY`.
+
+### Subquery
+
+```sql
+SELECT lname, fname FROM customer
+where city = (
+  SELECT city FROM customer WHERE lname = 'Higgins'
+)
+```
+
+### Isolation Levels
+
+###### Read Uncommitted (RU)
+* Permite leer datos sucios, registros fantasmas y no asegura lecturas repetibles.
+
+###### Read Committed (RC) default
+* No permite leer datos sucios, permite registros fantasmas y tampoco asegura lecturas repetibles.
+
+###### Repeatable Read (RR)
+* No permite leer datos sucios, permite registros fantasmas y asegura lecturas repetibles lockeando en shared cuando lee. Esto complica la concurrencia.
+
+###### Serialized Read (S)
+* No permite leer datos sucios y registros fantasmas, asegurando lecturas repetibles. Lockea lo que matchea las queries.
+
+### Triggers
+
+Es un mecanismo que ejecuta una sentencia SQL cuando ocurre cierto evento.
+
+`Evento => Trigger => Accion`
+
+##### Evento
+* Un evento puede ser `INSERT`, `UPDATE`, `DELETE`, etc.
+
+##### Momento
+* El momento puede ser `AFTER`, `BEFORE`, `FOREACH`, `INSTEAD OF`.
+
+##### Accion
+* Puede ser hacer un `INSERT`, `UPDATE` o `DELETE`, ejecutar un `Procedure` o una `Funcion`.
+
+Se usan para replicacion de datos o columnas con valores derivados.
+
+```sql
+create trigger nombre
+on tabla
+after update
+as
+begin
+  # SQL
+  # Exec Procedure
+  # T-SQL
+end
+```
